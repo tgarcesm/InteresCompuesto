@@ -14,9 +14,26 @@ export function initNavigation() {
   document.querySelector('.logo')?.addEventListener('click', () => {
     navigateToPanel(PANEL_IDS.HOME);
   });
+
+  // Restaurar panel desde hash al cargar
+  const initialPanel = getPanelFromHash() || PANEL_IDS.HOME;
+  showPanel(initialPanel);
+  history.replaceState({ panel: initialPanel }, '', `#${initialPanel}`);
+
+  // Manejar botón atrás/adelante
+  window.addEventListener('popstate', (e) => {
+    const panelId = e.state?.panel || getPanelFromHash() || PANEL_IDS.HOME;
+    showPanel(panelId);
+  });
 }
 
-export function navigateToPanel(panelId) {
+function getPanelFromHash() {
+  const hash = window.location.hash.slice(1);
+  const validPanels = Object.values(PANEL_IDS);
+  return validPanels.includes(hash) ? hash : null;
+}
+
+function showPanel(panelId) {
   document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
 
@@ -29,6 +46,11 @@ export function navigateToPanel(panelId) {
   if (callback) callback();
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+export function navigateToPanel(panelId) {
+  showPanel(panelId);
+  history.pushState({ panel: panelId }, '', `#${panelId}`);
 }
 
 export { PANEL_IDS };
