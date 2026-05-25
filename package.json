@@ -1,0 +1,10 @@
+{
+  "name": "cdt-pro",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Calculadora CDT Pro — inversiones Colombia",
+  "scripts": {
+    "dev": "npx --yes serve . -l 8080",
+    "start": "npm run dev"
+  }
+}

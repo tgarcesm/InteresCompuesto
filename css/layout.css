@@ -1,0 +1,273 @@
+.topbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 60px;
+  box-shadow: var(--sh);
+}
+
+.logo {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.logo em {
+  color: var(--primary);
+  font-style: normal;
+}
+
+.nav {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 4rem;
+}
+
+.ph {
+  margin-bottom: 1.5rem;
+}
+
+.ph-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+h2.ph-title {
+  font-size: 20px;
+}
+
+.ph-sub {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.ph-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Hero + CTA Comparar CDTs */
+.page-hero {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.375rem;
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--white) 55%);
+  border: 1px solid var(--primary-mid);
+  border-radius: var(--r2);
+  box-shadow: var(--sh);
+}
+
+.page-hero__text {
+  flex: 1;
+  min-width: 200px;
+}
+
+.page-hero .ph-title {
+  margin-bottom: 6px;
+}
+
+/* Dos calculadoras lado a lado */
+.calc-duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: stretch;
+  margin-bottom: 1.25rem;
+}
+
+.calc-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.calc-card .cb-stack {
+  flex: 1;
+}
+
+.calc-card--compound .ch-icon {
+  background: #ecfdf5;
+  color: var(--green);
+}
+
+/* Resultados debajo de las calculadoras */
+.results-zone {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.results-block {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 1rem 1.25rem 1.25rem;
+  box-shadow: var(--sh);
+  min-height: 120px;
+}
+
+.results-block__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.results-block.has-result .results-empty {
+  display: none;
+}
+
+.results-empty {
+  font-size: 13px;
+  color: var(--text3);
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  margin: 0;
+}
+
+.results-block.has-result .rs {
+  display: block;
+}
+
+.results-block .rs {
+  display: none;
+}
+
+.panel {
+  display: none;
+}
+
+.panel.active {
+  display: block;
+  animation: fadeUp 0.22s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rs {
+  display: none;
+}
+
+.rs.on {
+  display: block;
+  animation: fadeUp 0.25s ease;
+}
+
+.section-spaced {
+  margin-top: 1.75rem;
+}
+
+.footer {
+  border-top: 1px solid var(--border);
+  background: var(--white);
+  text-align: center;
+  padding: 0.875rem 1rem;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .calc-duo,
+  .results-zone {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .nav-btn {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .page-hero {
+    flex-direction: column;
+  }
+
+  .btn-cta-comparar {
+    width: 100%;
+  }
+
+  .wrap {
+    padding: 1rem 0.875rem 3rem;
+  }
+}
+
+@media (min-width: 641px) {
+  .topbar {
+    padding: 0 1.75rem;
+  }
+
+  .wrap {
+    padding: 1.75rem 1.5rem 4rem;
+  }
+}
