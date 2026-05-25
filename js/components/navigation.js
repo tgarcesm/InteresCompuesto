@@ -9,17 +9,33 @@ export function onPanelActivate(panelId, callback) {
 }
 
 export function initNavigation() {
+  const nav = document.getElementById('main-nav');
+  const hamburger = document.getElementById('nav-hamburger');
+
   document.querySelectorAll('[data-nav]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       navigateToPanel(btn.dataset.nav);
+      closeMenu();
     });
   });
 
   document.querySelector('.logo')?.addEventListener('click', (e) => {
     e.preventDefault();
     navigateToPanel(PANEL_IDS.HOME);
+    closeMenu();
   });
+
+  // Hamburguesa mobile
+  hamburger?.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    nav?.classList.toggle('open');
+  });
+
+  function closeMenu() {
+    hamburger?.classList.remove('open');
+    nav?.classList.remove('open');
+  }
 
   // Panel inicial desde hash o HOME por defecto
   const initialPanel = getPanelFromHash() || PANEL_IDS.HOME;

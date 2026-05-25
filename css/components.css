@@ -24,22 +24,6 @@
   font-weight: 600;
 }
 
-.nav-btn--cta {
-  background: var(--primary);
-  color: #fff;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(26, 86, 219, 0.35);
-}
-
-.nav-btn--cta:hover {
-  background: #1648c4;
-  color: #fff;
-}
-
-.nav-btn--cta.active {
-  background: #1648c4;
-  color: #fff;
-}
 
 .tax-toggles {
   display: flex;

@@ -19,11 +19,14 @@
       <div class="logo-icon" aria-hidden="true">$</div>
       CDT<em>Pro</em>
     </div>
-    <nav class="nav" aria-label="Secciones principales">
+    <button class="nav-hamburger" type="button" id="nav-hamburger" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" id="main-nav" aria-label="Secciones principales">
       <button class="nav-btn active" type="button" data-nav="home">Inicio</button>
       <button class="nav-btn" type="button" data-nav="cdt">Calculadora CDT</button>
       <button class="nav-btn" type="button" data-nav="compuesto">Interés compuesto</button>
-      <button class="nav-btn nav-btn--cta" type="button" data-nav="comparar">Comparar CDTs</button>
+      <button class="nav-btn" type="button" data-nav="comparar">Comparar CDTs</button>
     </nav>
   </header>
 
@@ -191,17 +194,28 @@
           </div>
         </article>
 
-        <div id="res-cdt" class="rs">
-          <div class="g4">
-            <div class="metric"><div class="m-label">Capital inicial</div><div class="m-val pri" id="r-cap">—</div></div>
-            <div class="metric"><div class="m-label">Interés bruto</div><div class="m-val" id="r-bruto">—</div></div>
-            <div class="metric metric--rete" id="r-rete-wrap" hidden><div class="m-label">Retefuente (4%)</div><div class="m-val red" id="r-rete">—</div></div>
-            <div class="metric metric--gmf" id="r-gmf-wrap" hidden><div class="m-label">4×1000 (GMF)</div><div class="m-val red" id="r-gmf">—</div></div>
-            <div class="metric metric--neto"><div class="m-label">Interés neto</div><div class="m-val grn" id="r-neto">—</div><div id="r-badge" class="m-badge mb-g" hidden>▲ <span id="r-pct"></span></div></div>
-            <div class="metric"><div class="m-label">Tasa neta E.A.</div><div class="m-val amb" id="r-tasa">—</div></div>
-            <div class="metric metric--final"><div class="m-label">Capital final neto</div><div class="m-val pri" id="r-final">—</div></div>
+        <div>
+          <div id="res-cdt" class="rs">
+            <div class="g4">
+              <div class="metric"><div class="m-label">Capital inicial</div><div class="m-val pri" id="r-cap">—</div></div>
+              <div class="metric"><div class="m-label">Interés bruto</div><div class="m-val" id="r-bruto">—</div></div>
+              <div class="metric metric--rete" id="r-rete-wrap" hidden><div class="m-label">Retefuente (4%)</div><div class="m-val red" id="r-rete">—</div></div>
+              <div class="metric metric--gmf" id="r-gmf-wrap" hidden><div class="m-label">4×1000 (GMF)</div><div class="m-val red" id="r-gmf">—</div></div>
+              <div class="metric metric--neto"><div class="m-label">Interés neto</div><div class="m-val grn" id="r-neto">—</div><div id="r-badge" class="m-badge mb-g" hidden>▲ <span id="r-pct"></span></div></div>
+              <div class="metric"><div class="m-label">Tasa neta E.A.</div><div class="m-val amb" id="r-tasa">—</div></div>
+              <div class="metric metric--final"><div class="m-label">Capital final neto</div><div class="m-val pri" id="r-final">—</div></div>
+            </div>
+            <div class="ss" id="rss"></div>
           </div>
-          <div class="ss" id="rss"></div>
+
+          <div class="cdt-compare-banner">
+            <div class="cdt-compare-banner__icon">⚖️</div>
+            <div class="cdt-compare-banner__text">
+              <strong>¿Tienes varias opciones de CDT?</strong>
+              <p>Compara hasta 5 CDTs lado a lado y encuentra la mejor rentabilidad.</p>
+            </div>
+            <button class="btn btn-compare" type="button" data-goto="comparar">Comparar CDTs →</button>
+          </div>
         </div>
       </div>
     </section>
