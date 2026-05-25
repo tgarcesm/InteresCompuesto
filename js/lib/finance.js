@@ -1,19 +1,24 @@
 import {
   RETEFUENTE_RATE,
+  RETEFUENTE_CAJITA_RATE,
   CUATRO_POR_MIL_RATE,
   DAYS_PER_YEAR,
   VERDICT_THRESHOLD_PP,
 } from '../config/constants.js';
 
-/** Retefuente (4% intereses) y 4×1000 (0,4% movimientos) */
+/**
+ * Retefuente (4% intereses) y 4×1000 (0,4% sobre el saldo total al retirar)
+ * @param interesBruto - intereses totales generados
+ * @param saldoFinal - monto total que se retira (para GMF)
+ */
 export function calcularDescuentos({
   interesBruto,
-  montoMovimientos,
+  saldoFinal,
   aplicarRete,
   aplicarCuatroPorMil,
 }) {
   const retefuente = aplicarRete ? interesBruto * RETEFUENTE_RATE : 0;
-  const cuatroPorMil = aplicarCuatroPorMil ? montoMovimientos * CUATRO_POR_MIL_RATE : 0;
+  const cuatroPorMil = aplicarCuatroPorMil ? saldoFinal * CUATRO_POR_MIL_RATE : 0;
   const interesNeto = interesBruto - retefuente;
 
   return {
@@ -35,13 +40,14 @@ export function calculateCDT({
   aplicarCuatroPorMil = false,
 }) {
   const interesBruto = capital * (Math.pow(1 + tasaEA, dias / DAYS_PER_YEAR) - 1);
+  const saldoBruto = capital + interesBruto;
   const { retefuente, cuatroPorMil, interesNeto } = calcularDescuentos({
     interesBruto,
-    montoMovimientos: capital,
+    saldoFinal: saldoBruto,
     aplicarRete,
     aplicarCuatroPorMil,
   });
-  const capitalFinal = capital + interesNeto - cuatroPorMil;
+  const capitalFinal = saldoBruto - retefuente - cuatroPorMil;
   const tasaNetaEA =
     dias > 0 && capital > 0
       ? (Math.pow(capitalFinal / capital, DAYS_PER_YEAR / dias) - 1) * 100
@@ -116,6 +122,7 @@ export function calculateCompoundInterest({
   const aportePorPeriodo = (aporteMensual * 12) / periodosPorAnio;
 
   let saldo = aporteInicial;
+  let interesesNetoAnterior = 0;
   const yearlySnapshots = [];
 
   for (let periodo = 1; periodo <= anios * periodosPorAnio; periodo++) {
@@ -125,21 +132,24 @@ export function calculateCompoundInterest({
       const year = periodo / periodosPorAnio;
       const aportadoAcum = aporteInicial + aporteMensual * 12 * year;
       const interesBrutoAcum = Math.max(0, saldo - aportadoAcum);
-      const { interesNeto, retefuente, cuatroPorMil } = calcularDescuentos({
-        interesBruto: interesBrutoAcum,
-        montoMovimientos: aportadoAcum,
-        aplicarRete,
-        aplicarCuatroPorMil,
-      });
-      const capitalNeto = saldo - retefuente - cuatroPorMil;
+      const reteAcum = aplicarRete ? interesBrutoAcum * RETEFUENTE_RATE : 0;
+      const interesesAcum = interesBrutoAcum - reteAcum;
+      const capitalNeto = saldo - reteAcum;
+      const rendimientoAnio = interesesAcum - interesesNetoAnterior;
+      const rendimientoPct = aportadoAcum > 0 ? (interesesAcum / aportadoAcum) * 100 : 0;
+
       yearlySnapshots.push({
         year,
         aportadoAcum,
-        interesesAcum: interesNeto,
+        interesesAcum,
         interesBrutoAcum,
+        reteAcum,
         capitalTotal: capitalNeto,
-        rendimientoPct: aportadoAcum > 0 ? (interesNeto / aportadoAcum) * 100 : 0,
+        rendimientoAnio,
+        rendimientoPct,
       });
+
+      interesesNetoAnterior = interesesAcum;
     }
   }
 
@@ -147,7 +157,7 @@ export function calculateCompoundInterest({
   const interesBruto = Math.max(0, saldo - totalAportado);
   const { retefuente, cuatroPorMil, interesNeto, totalDescuentos } = calcularDescuentos({
     interesBruto,
-    montoMovimientos: totalAportado,
+    saldoFinal: saldo,
     aplicarRete,
     aplicarCuatroPorMil,
   });
@@ -169,19 +179,21 @@ export function calculateCompoundInterest({
 }
 
 /**
- * Simulación Cajita + CDT (mes a mes con interés diario compuesto)
+ * Simulación Cajita + CDT (día a día con interés diario compuesto)
  *
  * - Capital inicial → CDT
- * - Aportes mensuales → cajita (genera su propia tasa E.A.)
- * - Al vencer el CDT (cada plazoCdtDias), se capitaliza: CDT + cajita → nuevo CDT
+ * - Aportes mensuales → cajita (genera su propia E.A. sobre saldo acumulado)
+ * - Al cumplirse el período de capitalización (= plazo CDT en días):
+ *     CDT + cajita → nuevo CDT, cajita queda en $0
  * - Ciclo se repite hasta cumplir el plazo total en años
+ * - 4×1000 se aplica sobre el saldo total final al retirar
  */
 export function simulateCajitaCDT({
   capitalInicial,
   aporteMensual,
   tasaCdtEA,
   tasaCajitaEA,
-  plazoCdtDias,
+  periodoCapitalizacionDias,
   anios,
   aplicarRete = false,
   aplicarCuatroPorMil = false,
@@ -192,69 +204,96 @@ export function simulateCajitaCDT({
 
   let saldoCdt = capitalInicial;
   let saldoCajita = 0;
-  let diasDesdeInicioCdt = 0;
+  let diasDesdeCapitalizacion = 0;
   let ciclos = 0;
   let totalInteresesCdt = 0;
   let totalInteresesCajita = 0;
   let totalAportado = capitalInicial;
-  let diaActual = 0;
+  let cajitaPicoAnual = 0;
+  let interesesAcumAnterior = 0;
 
   const yearlySnapshots = [];
-  let saldoCdtInicioAnio = saldoCdt;
-  let saldoCajitaInicioAnio = saldoCajita;
 
-  while (diaActual < totalDias) {
-    diaActual++;
-    diasDesdeInicioCdt++;
+  for (let dia = 1; dia <= totalDias; dia++) {
+    diasDesdeCapitalizacion++;
 
-    const interesDiaCdt = saldoCdt * tasaDiariaCdt;
-    saldoCdt += interesDiaCdt;
-    totalInteresesCdt += interesDiaCdt;
-
-    const interesDiaCajita = saldoCajita * tasaDiariaCajita;
-    saldoCajita += interesDiaCajita;
-    totalInteresesCajita += interesDiaCajita;
-
-    // Aporte mensual a cajita (cada 30 días aprox)
-    if (diaActual % 30 === 0 && aporteMensual > 0) {
+    // 1) Aporte mensual a cajita cada 30 días (día 30, 60, 90...)
+    //    12 aportes por año. No se aporta el día 1 (ese es el capital inicial al CDT).
+    if (dia % 30 === 0 && aporteMensual > 0) {
       saldoCajita += aporteMensual;
       totalAportado += aporteMensual;
     }
 
-    // Vencimiento del CDT → capitalización
-    if (diasDesdeInicioCdt >= plazoCdtDias) {
-      ciclos++;
-      const totalCapitalizar = saldoCdt + saldoCajita;
-      saldoCdt = totalCapitalizar;
-      saldoCajita = 0;
-      diasDesdeInicioCdt = 0;
+    // 2) Interés diario CDT
+    const interesDiaCdt = saldoCdt * tasaDiariaCdt;
+    saldoCdt += interesDiaCdt;
+    totalInteresesCdt += interesDiaCdt;
+
+    // 3) Interés diario cajita
+    const interesDiaCajita = saldoCajita * tasaDiariaCajita;
+    saldoCajita += interesDiaCajita;
+    totalInteresesCajita += interesDiaCajita;
+
+    // Trackear el pico de la cajita antes de consolidar
+    if (saldoCajita > cajitaPicoAnual) {
+      cajitaPicoAnual = saldoCajita;
     }
 
-    // Snapshot anual
-    if (diaActual % DAYS_PER_YEAR === 0) {
-      const year = diaActual / DAYS_PER_YEAR;
+    // 4) Capitalización: CDT vence → cajita (con intereses) + CDT → nuevo CDT
+    if (diasDesdeCapitalizacion >= periodoCapitalizacionDias) {
+      ciclos++;
+      saldoCdt += saldoCajita;
+      saldoCajita = 0;
+      diasDesdeCapitalizacion = 0;
+    }
+
+    // 5) Snapshot anual
+    if (dia % DAYS_PER_YEAR === 0) {
+      const year = dia / DAYS_PER_YEAR;
+      const interesesAcum = totalInteresesCdt + totalInteresesCajita;
+      const rendimientoAnio = interesesAcum - interesesAcumAnterior;
+      const reteAcum = aplicarRete
+        ? totalInteresesCdt * RETEFUENTE_RATE + totalInteresesCajita * RETEFUENTE_CAJITA_RATE
+        : 0;
+      const rendimientoPct = totalAportado > 0
+        ? ((interesesAcum - reteAcum) / totalAportado) * 100
+        : 0;
+
       yearlySnapshots.push({
         year,
         saldoCdt,
-        saldoCajita,
+        saldoCajita: cajitaPicoAnual,
         totalCombinado: saldoCdt + saldoCajita,
         aportadoAcum: totalAportado,
         interesesCdt: totalInteresesCdt,
         interesesCajita: totalInteresesCajita,
+        interesesAcum,
+        reteAcum,
+        rendimientoAnio,
+        rendimientoPct,
         ciclosAcum: ciclos,
       });
+
+      interesesAcumAnterior = interesesAcum;
+      cajitaPicoAnual = 0;
     }
   }
 
-  // Snapshot final si no cae justo en múltiplo de 365
-  const totalBruto = saldoCdt + saldoCajita;
-  const interesBrutoTotal = totalInteresesCdt + totalInteresesCajita;
-  const { retefuente, cuatroPorMil, totalDescuentos } = calcularDescuentos({
-    interesBruto: interesBrutoTotal,
-    montoMovimientos: totalAportado,
-    aplicarRete,
-    aplicarCuatroPorMil,
-  });
+  // Consolidación final: si el último día no coincidió con capitalización,
+  // forzar la transferencia de cajita a CDT (el usuario retira todo)
+  if (saldoCajita > 0) {
+    saldoCdt += saldoCajita;
+    saldoCajita = 0;
+  }
+
+  const totalBruto = saldoCdt;
+
+  const reteCdt = aplicarRete ? totalInteresesCdt * RETEFUENTE_RATE : 0;
+  const reteCajita = aplicarRete ? totalInteresesCajita * RETEFUENTE_CAJITA_RATE : 0;
+  const retefuente = reteCdt + reteCajita;
+  const cuatroPorMil = aplicarCuatroPorMil ? totalBruto * CUATRO_POR_MIL_RATE : 0;
+  const totalDescuentos = retefuente + cuatroPorMil;
+
   const capitalFinal = totalBruto - totalDescuentos;
   const rendimientoTotalPct =
     totalAportado > 0 ? ((capitalFinal - totalAportado) / totalAportado) * 100 : 0;
@@ -266,9 +305,11 @@ export function simulateCajitaCDT({
     totalCombinado: totalBruto,
     capitalFinal,
     totalAportado,
-    interesBrutoTotal,
+    interesBrutoTotal: totalInteresesCdt + totalInteresesCajita,
     interesesCdt: totalInteresesCdt,
     interesesCajita: totalInteresesCajita,
+    reteCdt,
+    reteCajita,
     retefuente,
     cuatroPorMil,
     rendimientoTotalPct,

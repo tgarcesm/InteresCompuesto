@@ -20,8 +20,8 @@ function bootstrap() {
 
   onPanelActivate(PANEL_IDS.COMPARAR, renderComparator);
 
-  document.getElementById('btn-go-comparar')?.addEventListener('click', () => {
-    navigateToPanel(PANEL_IDS.COMPARAR);
+  document.querySelectorAll('[data-goto]').forEach((btn) => {
+    btn.addEventListener('click', () => navigateToPanel(btn.dataset.goto));
   });
 }
 

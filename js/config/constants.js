@@ -1,5 +1,6 @@
 /** Tasas y umbrales del dominio financiero (Colombia) */
 export const RETEFUENTE_RATE = 0.04;
+export const RETEFUENTE_CAJITA_RATE = 0.07;
 /** Gravamen 4×1000 (GMF): 4 por mil sobre movimientos */
 export const CUATRO_POR_MIL_RATE = 0.004;
 export const DAYS_PER_YEAR = 365;
@@ -11,7 +12,9 @@ export const CHART_COLORS = {
 };
 
 export const PANEL_IDS = {
+  HOME: 'home',
   CDT: 'cdt',
+  COMPUESTO: 'compuesto',
   COMPARAR: 'comparar',
 };
 

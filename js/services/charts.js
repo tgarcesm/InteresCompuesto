@@ -63,6 +63,32 @@ export function createStackedBarChart(canvas, config, existingChart = null) {
 export function createScenarioLineChart(canvas, config, existingChart = null) {
   if (existingChart) existingChart.destroy();
 
+  const hasSecondaryAxis = config.datasets.some((ds) => ds.yAxisID === 'y2');
+
+  const scales = {
+    x: {
+      ticks: {
+        color: '#6b7280',
+        autoSkip: config.autoSkipX ?? false,
+        maxRotation: config.maxRotationX ?? 0,
+      },
+      grid: { color: 'rgba(0,0,0,0.05)' },
+    },
+    y: {
+      position: 'left',
+      ticks: { color: '#6b7280', callback: chartAxisMoney },
+      grid: { color: 'rgba(0,0,0,0.05)' },
+    },
+  };
+
+  if (hasSecondaryAxis) {
+    scales.y2 = {
+      position: 'right',
+      ticks: { color: '#92400e', callback: chartAxisMoney },
+      grid: { drawOnChartArea: false },
+    };
+  }
+
   return new Chart(canvas, {
     type: 'line',
     data: {
@@ -72,10 +98,12 @@ export function createScenarioLineChart(canvas, config, existingChart = null) {
         data: ds.data,
         borderColor: ds.color,
         backgroundColor: ds.color + '22',
-        borderWidth: 2,
-        pointRadius: 3,
+        borderWidth: ds.dashed ? 1.5 : 2,
+        borderDash: ds.dashed ? [6, 4] : [],
+        pointRadius: ds.dashed ? 2 : 3,
         tension: 0.25,
         fill: false,
+        yAxisID: ds.yAxisID || 'y',
       })),
     },
     options: {
@@ -93,20 +121,7 @@ export function createScenarioLineChart(canvas, config, existingChart = null) {
           },
         },
       },
-      scales: {
-        x: {
-          ticks: {
-            color: '#6b7280',
-            autoSkip: config.autoSkipX ?? false,
-            maxRotation: config.maxRotationX ?? 0,
-          },
-          grid: { color: 'rgba(0,0,0,0.05)' },
-        },
-        y: {
-          ticks: { color: '#6b7280', callback: chartAxisMoney },
-          grid: { color: 'rgba(0,0,0,0.05)' },
-        },
-      },
+      scales,
     },
   });
 }

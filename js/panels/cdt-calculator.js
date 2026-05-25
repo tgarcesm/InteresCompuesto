@@ -76,7 +76,5 @@ export function calcCDT() {
     <span>4×1000: <strong>${aplicarCuatroPorMil ? fmt(r.cuatroPorMil) : 'No'}</strong></span>
     <span>Rend. neto: <strong>${pct(r.rendimientoNetoPct)}</strong></span>`;
 
-  const block = document.getElementById('results-cdt-block');
   els.results()?.classList.add('on');
-  block?.classList.add('has-result');
 }

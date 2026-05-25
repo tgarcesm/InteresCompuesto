@@ -41,50 +41,6 @@
   color: #fff;
 }
 
-.btn-cta-comparar {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  padding: 0.875rem 1.25rem;
-  padding-right: 2.75rem;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: var(--r2);
-  cursor: pointer;
-  position: relative;
-  min-width: 200px;
-  text-align: left;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 4px 14px rgba(26, 86, 219, 0.4);
-}
-
-.btn-cta-comparar:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(26, 86, 219, 0.45);
-}
-
-.btn-cta-comparar__title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-weight: 800;
-  font-size: 16px;
-  line-height: 1.2;
-}
-
-.btn-cta-comparar__sub {
-  font-size: 11px;
-  opacity: 0.9;
-  font-weight: 500;
-}
-
-.btn-cta-comparar__arrow {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
 .tax-toggles {
   display: flex;
   flex-direction: column;
@@ -169,8 +125,12 @@
 
 .g4 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 @media (max-width: 620px) {
@@ -449,9 +409,10 @@
 
 .m-val {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .m-val.pri {
@@ -736,4 +697,94 @@ tbody tr:hover td {
 
 .g2-mt {
   margin-top: 0;
+}
+
+/* Tabla de proyección */
+.proj-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.proj-table th {
+  background: var(--bg);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text3);
+  padding: 8px 10px;
+  text-align: right;
+  border-bottom: 2px solid var(--border);
+}
+
+.proj-table th:first-child {
+  text-align: center;
+}
+
+.proj-table td {
+  padding: 7px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.proj-table td:first-child {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.proj-table tbody tr:hover {
+  background: rgba(26, 86, 219, 0.03);
+}
+
+.row-inflection {
+  background: rgba(5, 150, 105, 0.08) !important;
+  position: relative;
+}
+
+.row-inflection td {
+  font-weight: 600;
+}
+
+.inflection-note {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 600;
+  padding: 8px 12px;
+  background: rgba(5, 150, 105, 0.06);
+  border-radius: var(--r1);
+  border-left: 3px solid var(--green);
+}
+
+/* Toggle detalle técnico */
+.detail-toggle-wrap {
+  margin-top: 1rem;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: opacity 0.15s;
+}
+
+.btn-link:hover {
+  opacity: 0.7;
+}
+
+.proj-table--detail th,
+.proj-table--detail td {
+  font-size: 11px;
+  padding: 5px 8px;
+}
+
+.proj-table--detail {
+  margin-top: 10px;
+  opacity: 0.85;
 }
