@@ -1,11 +1,9 @@
+import { Chart } from 'chart.js/auto';
 import { CHART_COLORS } from '../config/constants.js';
 import { fmt, chartAxisMoney } from '../utils/format.js';
 
 /**
  * Gráfico de barras apiladas reutilizable (Chart.js)
- * @param {HTMLCanvasElement} canvas
- * @param {{ labels: string[], datasets: { label: string, data: number[], color?: string }[] }} config
- * @param {import('chart.js').Chart | null} existingChart
  */
 export function createStackedBarChart(canvas, config, existingChart = null) {
   if (existingChart) existingChart.destroy();

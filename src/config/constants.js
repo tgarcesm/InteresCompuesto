@@ -18,6 +18,14 @@ export const PANEL_IDS = {
   COMPARAR: 'comparar',
 };
 
+/** Rutas limpias (sin #) — React Router */
+export const ROUTES = {
+  HOME: '/',
+  CDT: '/cdt',
+  COMPUESTO: '/compuesto',
+  COMPARAR: '/comparar',
+};
+
 export const CHART_SCENARIO_COLORS = {
   bajo: '#dc2626',
   base: '#1a56db',

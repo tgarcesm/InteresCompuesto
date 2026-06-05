@@ -1,4 +1,6 @@
 .nav-btn {
+  display: inline-block;
+  text-decoration: none;
   background: none;
   border: none;
   color: var(--text2);
